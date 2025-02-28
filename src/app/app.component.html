@@ -106,13 +106,14 @@
   }
 </style>
 
-<main class="main">
-  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-    <input formControlName="name" placeholder="Введите имя">
-    <button type="submit" [disabled]="loginForm.invalid">Войти</button>
-  </form>
-  <p>{{ message }}</p>
-</main>
+<router-outlet></router-outlet>
+<!--<main class="main">-->
+<!--  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">-->
+<!--    <input formControlName="name" placeholder="Введите имя">-->
+<!--    <button type="submit" [disabled]="loginForm.invalid">Войти</button>-->
+<!--  </form>-->
+<!--  <p>{{ message }}</p>-->
+<!--</main>-->
 
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 <!-- * * * * * * * * * * * The content above * * * * * * * * * * * * -->
@@ -122,5 +123,3 @@
 <!-- * * * * * * * * * * End of Placeholder  * * * * * * * * * * * * -->
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 
-
-<router-outlet />

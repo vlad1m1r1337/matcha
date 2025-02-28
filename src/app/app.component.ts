@@ -1,36 +1,45 @@
-import { Component } from '@angular/core';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from './service';
-import {RouterOutlet} from '@angular/router'; // Add this line
+import {RouterLink, RouterOutlet} from '@angular/router';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators'; // Add RxJS operators
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterOutlet],  // Добавляем ReactiveFormsModule
-  templateUrl: './app.component.html',
+  imports: [ReactiveFormsModule, RouterOutlet, RouterLink],
+  // templateUrl: './app.component.html',
+  template: `
+    <router-outlet>
+      <a [routerLink]="['/']">Главная</a>
+      <a [routerLink]="['/login']">Логин</a>
+      <a [routerLink]="['/registr']">Регистрация</a>
+    </router-outlet>
+  `,
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  loginForm: FormGroup;
+  title = 'lalalend'
+  // loginForm: FormGroup;
   message = '';
 
-  constructor(private fb: FormBuilder, private authService: AuthService) {
-    this.loginForm = this.fb.group({
-      name: ['', Validators.required]
-    });
-  }
+  // constructor(private fb: FormBuilder, private authService: AuthService) {
+  //   this.loginForm = this.fb.group({
+  //     name: ['', Validators.required]
+  //   });
+  // }
 
-  onSubmit() {
-    if (this.loginForm.valid) {
-      const name = this.loginForm.value.name;
-      this.authService.login(name).subscribe({
-        next: (response) => {
-          this.message = response.message;
-        },
-        error: (err) => {
-          this.message = err.error.message || 'Ошибка входа';
-        }
-      });
-    }
-  }
+  // onSubmit() {
+  //   if (this.loginForm.valid) {
+  //     const name = this.loginForm.value.name;
+  //     this.authService.login(name).subscribe({
+  //       next: (response) => {
+  //         this.message = response.message;
+  //       },
+  //       error: (err) => {
+  //         this.message = err.error.message || 'Ошибка входа';
+  //       }
+  //     });
+  //   }
+  // }
 }
