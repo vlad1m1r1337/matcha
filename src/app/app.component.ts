@@ -8,38 +8,16 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators'; // Add RxJS
   selector: 'app-root',
   standalone: true,
   imports: [ReactiveFormsModule, RouterOutlet, RouterLink],
-  // templateUrl: './app.component.html',
   template: `
     <router-outlet>
       <a [routerLink]="['/']">Главная</a>
       <a [routerLink]="['/login']">Логин</a>
       <a [routerLink]="['/registr']">Регистрация</a>
+      <a [routerLink]="['/pipe']">Pipe</a>
     </router-outlet>
   `,
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
   title = 'lalalend'
-  // loginForm: FormGroup;
-  message = '';
-
-  // constructor(private fb: FormBuilder, private authService: AuthService) {
-  //   this.loginForm = this.fb.group({
-  //     name: ['', Validators.required]
-  //   });
-  // }
-
-  // onSubmit() {
-  //   if (this.loginForm.valid) {
-  //     const name = this.loginForm.value.name;
-  //     this.authService.login(name).subscribe({
-  //       next: (response) => {
-  //         this.message = response.message;
-  //       },
-  //       error: (err) => {
-  //         this.message = err.error.message || 'Ошибка входа';
-  //       }
-  //     });
-  //   }
-  // }
 }
