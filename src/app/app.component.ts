@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { AuthService } from './service';
+import { Component } from '@angular/core';
+import { ReactiveFormsModule } from '@angular/forms';
 import {RouterLink, RouterOutlet} from '@angular/router';
-import { debounceTime, distinctUntilChanged } from 'rxjs/operators'; // Add RxJS operators
+import {LoggerService} from './service';
+
+
 
 @Component({
   selector: 'app-root',
@@ -14,10 +15,13 @@ import { debounceTime, distinctUntilChanged } from 'rxjs/operators'; // Add RxJS
       <a [routerLink]="['/login']">Логин</a>
       <a [routerLink]="['/registr']">Регистрация</a>
       <a [routerLink]="['/pipe']">Pipe</a>
+      <a [routerLink]="['/templates']">Templates</a>
     </router-outlet>
   `,
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  title = 'lalalend'
+  constructor(private logger: LoggerService) {
+    this.logger.log('Компонент инициализирован!');
+  }
 }
