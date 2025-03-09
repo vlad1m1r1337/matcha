@@ -15,7 +15,9 @@ import {LoggerService} from './service';
       <a [routerLink]="['/login']">Логин</a>
       <a [routerLink]="['/registr']">Регистрация</a>
       <a [routerLink]="['/pipe']">Pipe</a>
-      <a [routerLink]="['/templates']">Templates</a>
+      <a [routerLink]="['/pipe']">Pipe</a>
+      <a [routerLink]="['/change_det']">Change Detection</a>
+      <a [routerLink]="['/binding']">Binding</a>
     </router-outlet>
   `,
   styleUrls: ['./app.component.scss']

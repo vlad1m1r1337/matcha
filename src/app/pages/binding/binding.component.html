@@ -1,0 +1,17 @@
+<h1>{{title}}</h1>
+<p>{{body}}</p>
+<hr/>
+<hr/>
+<div>
+  <h2 class="text-error">Experiments: {{message}}</h2>
+  <form class="form-inline">
+    <input type="text" [(ngModel)]="message" name="message" placeholder="Message">
+    <button type="submit" class="btn" (click)="updateMessage(message)">Update Message</button>
+  </form>
+</div>
+
+
+<div *ngIf="hero">{{hero}}</div>
+<div *ngFor="let hero of heroes">{{hero}}</div>
+<span [ngSwitch]="toeChoice">
+<span *ngSwitchCase="'Eenie'">Eenie</span> <span *ngSwitchCase="'Meanie'">Meanie</span> <span *ngSwitchCase="'Miney'">Miney</span> <span *ngSwitchCase="'Moe'">Moe</span> <span *ngSwitchDefault>other</span> </span>
