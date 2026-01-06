@@ -1,59 +1,101 @@
-# Matcha
+# matcha
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.1.7.
+## Docker
 
-## Development server
+В проекте используется `docker compose` для поднятия Postgres и pgAdmin.
 
-To start a local development server, run:
+### Требования
 
-```bash
-ng serve
-```
+- Docker + Docker Compose plugin (`docker compose version`)
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### Быстрый старт
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+Запуск БД и pgAdmin:
 
 ```bash
-ng generate component component-name
+docker compose up -d db pgadmin
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Проверить статус:
 
 ```bash
-ng generate --help
+docker compose ps
 ```
 
-## Building
-
-To build the project run:
+Остановить:
 
 ```bash
-ng build
+docker compose down
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### Порты
 
-## Running unit tests
+- Postgres наружу: `${DB_PORT:-5433}` → контейнерный `5432`
+- pgAdmin наружу: `${PGADMIN_PORT:-8080}` → контейнерный `80`
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+Можно переопределить через переменные окружения или `.env` рядом с `docker-compose.yml`:
 
 ```bash
-ng test
+DB_PORT=5433
+PGADMIN_PORT=8080
 ```
 
-## Running end-to-end tests
+### Доступ к Postgres
 
-For end-to-end (e2e) testing, run:
+Параметры (см. `docker-compose.yml`):
+
+- DB: `matcha_test`
+- User: `matcha`
+- Password: `matcha_password`
+
+Подключиться через psql внутри контейнера:
 
 ```bash
-ng e2e
+docker compose exec -T db psql -U matcha -d matcha_test
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+### Инициализация схемы и тестовых данных
 
-## Additional Resources
+Скрипты из `db/init` монтируются в контейнер как `/docker-entrypoint-initdb.d`.
+Postgres выполняет их **только при первом создании** data volume (`pgdata`), когда БД ещё “пустая”.
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Если вы изменили `db/init/*.sql`, но данные/таблицы не обновились — это нормально: volume уже существует.
+
+#### Полный сброс БД (удалить volume и инициализировать заново)
+
+```bash
+docker compose down -v
+docker compose up -d db pgadmin
+```
+
+#### Прогнать SQL вручную (без удаления volume)
+
+Например, применить `00_schema.sql` к уже поднятой БД:
+
+```bash
+docker compose exec -T db psql -U matcha -d matcha_test -f /docker-entrypoint-initdb.d/00_schema.sql
+```
+
+### pgAdmin
+
+Открыть в браузере: `http://localhost:${PGADMIN_PORT:-8080}`
+
+Логин (см. `docker-compose.yml`):
+
+- Email: `admin@matcha.local`
+- Password: `admin_password`
+
+Добавление сервера в pgAdmin:
+
+- Host name/address: `db` (имя сервиса в compose)
+- Port: `5432`
+- Maintenance database: `matcha_test`
+- Username: `matcha`
+- Password: `matcha_password`
+
+### Troubleshooting
+
+- Если `db` “не видит” изменения в `db/init`: удалите volume (`docker compose down -v`) или прогоните SQL вручную через `psql -f`.
+- Если порт занят: поменяйте `DB_PORT`/`PGADMIN_PORT`.
+
+
