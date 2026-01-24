@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker compose:*)",
+      "Bash(python manage.py runserver:*)",
+      "Bash(timeout:*)",
+      "Bash(exit 0)",
+      "Bash(pip install:*)",
+      "Bash(curl:*)",
+      "Bash(python -m json.tool:*)",
+      "Bash(findstr:*)",
+      "Bash(python:*)",
+      "Bash(DJANGO_SETTINGS_MODULE=config.settings python:*)"
+    ]
+  }
+}
