@@ -14,16 +14,25 @@ class UserRepository(BaseRepository):
     Uses raw SQL queries (no ORM).
     """
 
-    def create(self, profile_id: int, name: str, surname: str, email: str, password_hash: str) -> UserDTO:
+    def create(
+        self,
+        profile_id: Optional[int],
+        name: str,
+        surname: str,
+        email: str,
+        password_hash: str,
+        is_verified: bool = False,
+    ) -> UserDTO:
         """
         Insert a new user into the database.
 
         Args:
-            profile_id: Foreign key to profiles table
+            profile_id: Foreign key to profiles table (nullable)
             name: User's first name
             surname: User's last name
             email: User's email (must be unique)
             password_hash: Hashed password (NOT plain text)
+            is_verified: Whether the user has verified their email
 
         Returns:
             UserDTO with the created user data
@@ -32,11 +41,13 @@ class UserRepository(BaseRepository):
             IntegrityError: If email is not unique or profile_id doesn't exist
         """
         query = """
-            INSERT INTO users (profile_id, name, surname, email, password)
-            VALUES (%s, %s, %s, %s, %s)
-            RETURNING id, profile_id, name, surname, email
+            INSERT INTO users (profile_id, name, surname, email, password, is_verified)
+            VALUES (%s, %s, %s, %s, %s, %s)
+            RETURNING id, profile_id, name, surname, email, is_verified
         """
-        row = self.execute_one(query, (profile_id, name, surname, email, password_hash))
+        row = self.execute_one(
+            query, (profile_id, name, surname, email, password_hash, is_verified)
+        )
         return self._row_to_dto(row)
 
     def get_by_id(self, user_id: int) -> Optional[UserDTO]:
@@ -50,7 +61,7 @@ class UserRepository(BaseRepository):
             UserDTO if found, None otherwise
         """
         query = """
-            SELECT id, profile_id, name, surname, email
+            SELECT id, profile_id, name, surname, email, is_verified
             FROM users
             WHERE id = %s
         """
@@ -68,7 +79,7 @@ class UserRepository(BaseRepository):
             UserDTO if found, None otherwise
         """
         query = """
-            SELECT id, profile_id, name, surname, email
+            SELECT id, profile_id, name, surname, email, is_verified
             FROM users
             WHERE email = %s
         """
@@ -87,7 +98,7 @@ class UserRepository(BaseRepository):
             List of UserDTO objects
         """
         query = """
-            SELECT id, profile_id, name, surname, email
+            SELECT id, profile_id, name, surname, email, is_verified
             FROM users
             ORDER BY id
             LIMIT %s OFFSET %s
@@ -130,7 +141,7 @@ class UserRepository(BaseRepository):
             UPDATE users
             SET {', '.join(set_clauses)}
             WHERE id = %s
-            RETURNING id, profile_id, name, surname, email
+            RETURNING id, profile_id, name, surname, email, is_verified
         """
 
         row = self.execute_one(query, tuple(params))
@@ -188,7 +199,7 @@ class UserRepository(BaseRepository):
         Convert a database row to UserDTO.
 
         Args:
-            row: Tuple of (id, profile_id, name, surname, email)
+            row: Tuple of (id, profile_id, name, surname, email, is_verified)
 
         Returns:
             UserDTO object
@@ -198,5 +209,6 @@ class UserRepository(BaseRepository):
             profile_id=row[1],
             name=row[2],
             surname=row[3],
-            email=row[4]
+            email=row[4],
+            is_verified=row[5] if len(row) > 5 else False,
         )

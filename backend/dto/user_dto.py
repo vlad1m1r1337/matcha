@@ -16,6 +16,7 @@ class UserDTO:
     name: str
     surname: str
     email: str
+    is_verified: bool = False
 
     def to_dict(self) -> dict:
         """Convert to dictionary for JSON serialization."""
@@ -24,7 +25,8 @@ class UserDTO:
             'profile_id': self.profile_id,
             'name': self.name,
             'surname': self.surname,
-            'email': self.email
+            'email': self.email,
+            'is_verified': self.is_verified,
         }
 
 
