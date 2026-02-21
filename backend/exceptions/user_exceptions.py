@@ -33,3 +33,11 @@ class ProfileNotFoundException(Exception):
     def __init__(self, profile_id: int):
         self.profile_id = profile_id
         super().__init__(f"Profile with id={profile_id} not found")
+
+
+class InvalidVerificationToken(Exception):
+    """Raised when email verification token is invalid or corrupt."""
+
+    def __init__(self, message: str = "Invalid verification token"):
+        self.message = message
+        super().__init__(message)

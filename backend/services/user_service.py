@@ -4,6 +4,8 @@ Handles validation, password hashing, and coordinates repository operations.
 """
 import hashlib
 import logging
+import time
+from django.conf import settings as django_settings
 from django.db import transaction, IntegrityError
 from typing import Optional
 
@@ -13,8 +15,11 @@ from exceptions import (
     UserNotFoundException,
     UserAlreadyExistsException,
     InvalidUserDataException,
-    ProfileNotFoundException
+    ProfileNotFoundException,
+    InvalidVerificationToken,
 )
+from services.token_service import encrypt as token_encrypt, decrypt as token_decrypt
+from services.notification_service import send_verification_email
 
 logger = logging.getLogger(__name__)
 
@@ -54,8 +59,6 @@ class UserService:
         # Hash password
         password_hash = self._hash_password(data.password)
 
-        # Create user in transaction
-        # Foreign key constraint will validate profile_id exists
         try:
             with transaction.atomic():
                 user = self.repository.create(
@@ -63,9 +66,12 @@ class UserService:
                     name=data.name,
                     surname=data.surname,
                     email=data.email,
-                    password_hash=password_hash
+                    password_hash=password_hash,
+                    is_verified=False,
                 )
-                return user
+            verification_token = token_encrypt(user.id)
+            send_verification_email(user.email, verification_token)
+            return user
         except IntegrityError as e:
             # Handle database constraint violations
             error_msg = str(e).lower()
@@ -75,6 +81,34 @@ class UserService:
                 raise ProfileNotFoundException(data.profile_id)
             else:
                 raise
+
+    def authorize_user_by_token(self, token: str) -> dict:
+        """
+        Verify email by token: decrypt token, find user, set is_verified=True.
+
+        Args:
+            token: Verification token from email link
+
+        Returns:
+            Dict with auth_token (mock) and redirect_url
+
+        Raises:
+            InvalidVerificationToken: If token is invalid
+            UserNotFoundException: If user not found
+        """
+        try:
+            user_id = token_decrypt(token)
+        except InvalidVerificationToken:
+            raise
+        user = self.repository.get_by_id(user_id)
+        if not user:
+            raise UserNotFoundException(user_id)
+        self.repository.update(user_id, is_verified=True)
+        redirect_url = getattr(
+            django_settings, 'VERIFICATION_REDIRECT_URL', 'http://localhost:3000'
+        ).rstrip('/')
+        auth_token = f"mock_jwt_{user_id}_{int(time.time())}"
+        return {"auth_token": auth_token, "redirect_url": redirect_url}
 
     def get_user(self, user_id: int) -> UserDTO:
         """

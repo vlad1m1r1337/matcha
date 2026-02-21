@@ -11,7 +11,8 @@ from exceptions import (
     UserNotFoundException,
     UserAlreadyExistsException,
     InvalidUserDataException,
-    ProfileNotFoundException
+    ProfileNotFoundException,
+    InvalidVerificationToken,
 )
   
 def index(request):
@@ -29,7 +30,7 @@ def users_list(request):
         with connection.cursor() as cursor:
             cursor.execute(
                 """
-                SELECT id, profile_id, name, surname, email
+                SELECT id, profile_id, name, surname, email, is_verified
                 FROM users
                 ORDER BY id
                 """
@@ -43,7 +44,7 @@ def users_list(request):
         )
 
     users = [
-        {"id": r[0], "profile_id": r[1], "name": r[2], "surname": r[3], "email": r[4]}
+        {"id": r[0], "profile_id": r[1], "name": r[2], "surname": r[3], "email": r[4], "is_verified": r[5] if len(r) > 5 else False}
         for r in rows
     ]
 
@@ -67,6 +68,35 @@ def user_list_create(request):
         return _handle_list_users(request, service)
     elif request.method == "POST":
         return _handle_create_user(request, service)
+
+
+@require_http_methods(["GET"])
+def verify_email(request):
+    """
+    GET /api/auth/verify-email/?token=... - Verify email by token, return auth_token and redirect_url.
+    """
+    token = request.GET.get("token")
+    if not token or not token.strip():
+        return JsonResponse(
+            {"error": "Missing or empty verification token"},
+            status=400,
+        )
+    try:
+        service = UserService()
+        result = service.authorize_user_by_token(token)
+        return JsonResponse(result, status=200)
+    except InvalidVerificationToken as e:
+        logger.warning("Invalid verification token: %s", e.message)
+        return JsonResponse(
+            {"error": e.message or "Invalid verification token"},
+            status=400,
+        )
+    except UserNotFoundException as e:
+        logger.warning("User not found for verification: %s", e.user_id)
+        return JsonResponse(
+            {"error": f"User with id={e.user_id} not found"},
+            status=400,
+        )
 
 
 @csrf_exempt

@@ -27,6 +27,9 @@ env = environ.Env(
     DB_PASSWORD=(str, 'matcha_password'),
     DB_HOST=(str, 'localhost'),
     DB_PORT=(int, 5433),
+    VERIFICATION_REDIRECT_URL=(str, 'http://localhost:3000'),
+    SITE_URL=(str, 'http://localhost:8000'),
+    EMAIL_VERIFICATION_MOCK=(bool, True),
 )
 
 _env_path = BASE_DIR / '.env'
@@ -161,3 +164,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# Email verification
+VERIFICATION_REDIRECT_URL = env('VERIFICATION_REDIRECT_URL')
+SITE_URL = env('SITE_URL')
+EMAIL_VERIFICATION_MOCK = env('EMAIL_VERIFICATION_MOCK')
+
+# Email backend (for non-mock sending)
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = env('DEFAULT_FROM_EMAIL', default='noreply@matcha.local')

@@ -17,7 +17,8 @@ CREATE TABLE IF NOT EXISTS users (
   name TEXT NOT NULL,
   surname TEXT NOT NULL,
   email TEXT NOT NULL UNIQUE,
-  password TEXT NOT NULL
+  password TEXT NOT NULL,
+  is_verified BOOLEAN NOT NULL DEFAULT FALSE
 );
 
 CREATE TABLE IF NOT EXISTS images (
@@ -49,17 +50,17 @@ INSERT INTO profiles (sex, sexual_preferences, biography, list_of_interests, fam
   ('male',   'female', 'Runner. Learning Ukrainian.',               ARRAY['running','languages','nature']::text[], 47, 30.575000, 50.445000),
   ('female', 'male',   'Tea, poetry, and rainy weather.',           ARRAY['tea','poetry','movies']::text[], 29, 30.560000, 50.430000);
 
-INSERT INTO users (profile_id, name, surname, email, password) VALUES
-  (1,  'Alex',   'Koval',     'alex.koval@example.com',   'password123'),
-  (2,  'Marta',  'Shevchenko','marta.shevchenko@example.com','password123'),
-  (3,  'Sam',    'Bondar',    'sam.bondar@example.com',   'password123'),
-  (4,  'Ihor',   'Melnyk',    'ihor.melnyk@example.com',  'password123'),
-  (5,  'Olena',  'Tkachenko', 'olena.tkachenko@example.com','password123'),
-  (6,  'Danylo', 'Hrytsenko', 'danylo.hrytsenko@example.com','password123'),
-  (7,  'Iryna',  'Pavlenko',  'iryna.pavlenko@example.com','password123'),
-  (8,  'Noah',   'Sydorenko', 'noah.sydorenko@example.com','password123'),
-  (9,  'Artem',  'Marchenko', 'artem.marchenko@example.com','password123'),
-  (10, 'Sofia',  'Klymenko',  'sofia.klymenko@example.com','password123');
+INSERT INTO users (profile_id, name, surname, email, password, is_verified) VALUES
+  (1,  'Alex',   'Koval',     'alex.koval@example.com',   'password123', TRUE),
+  (2,  'Marta',  'Shevchenko','marta.shevchenko@example.com','password123', TRUE),
+  (3,  'Sam',    'Bondar',    'sam.bondar@example.com',   'password123', TRUE),
+  (4,  'Ihor',   'Melnyk',    'ihor.melnyk@example.com',  'password123', TRUE),
+  (5,  'Olena',  'Tkachenko', 'olena.tkachenko@example.com','password123', TRUE),
+  (6,  'Danylo', 'Hrytsenko', 'danylo.hrytsenko@example.com','password123', TRUE),
+  (7,  'Iryna',  'Pavlenko',  'iryna.pavlenko@example.com','password123', TRUE),
+  (8,  'Noah',   'Sydorenko', 'noah.sydorenko@example.com','password123', TRUE),
+  (9,  'Artem',  'Marchenko', 'artem.marchenko@example.com','password123', TRUE),
+  (10, 'Sofia',  'Klymenko',  'sofia.klymenko@example.com','password123', TRUE);
 
 INSERT INTO images (profile_id, image_url, is_avatar) VALUES
   (1,  'https://picsum.photos/seed/matcha-1/600/600',  TRUE),

@@ -11,6 +11,7 @@ urlpatterns = [
     # N-layer architecture endpoints
     path('api/users/', views.user_list_create, name='user_list_create'),
     path('api/users/<int:user_id>/', views.user_detail, name='user_detail'),
+    path('api/auth/verify-email/', views.verify_email, name='verify_email'),
 
     # Swagger / OpenAPI
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
