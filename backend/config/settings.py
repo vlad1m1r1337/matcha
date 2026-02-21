@@ -55,8 +55,24 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'hello'
+    'rest_framework',
+    'drf_spectacular',
 ]
+
+# Django REST Framework settings
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+# drf-spectacular settings
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Matcha API',
+    'DESCRIPTION': 'Dating application backend API',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'PREPROCESSING_HOOKS': ['schema.custom_preprocessing_hook'],
+    'POSTPROCESSING_HOOKS': ['schema.custom_postprocessing_hook'],
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',

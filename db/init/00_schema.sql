@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS profiles (
 
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
-  profile_id INTEGER NOT NULL UNIQUE REFERENCES profiles(id) ON DELETE CASCADE,
+  profile_id INTEGER UNIQUE REFERENCES profiles(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
   surname TEXT NOT NULL,
   email TEXT NOT NULL UNIQUE,
@@ -37,32 +37,30 @@ CREATE UNIQUE INDEX IF NOT EXISTS images_one_avatar_per_profile
 -- Note: docker-entrypoint-initdb.d scripts run only on first DB init.
 -- ------------------------------------------------------------
 
-INSERT INTO profiles (id, sex, sexual_preferences, biography, list_of_interests, fame, longitude, latitude) VALUES
-  (1,  'male',   'female', 'Coffee, hiking, and honest conversations.', ARRAY['hiking','coffee','travel']::text[], 42, 30.523400, 50.450100),
-  (2,  'female', 'male',   'Bookworm. Learning to cook Italian.',       ARRAY['books','cooking','movies']::text[], 18, 30.516700, 50.433300),
-  (3,  'other',  'both',   'Music producer. Night walks are the best.', ARRAY['music','photography','art']::text[], 67, 30.500000, 50.454660),
-  (4,  'male',   'both',   'Gym, startups, and board games.',           ARRAY['fitness','startups','boardgames']::text[], 55, 30.540000, 50.460000),
-  (5,  'female', 'both',   'Dog person. Sunday brunch enthusiast.',     ARRAY['dogs','brunch','yoga']::text[], 33, 30.490000, 50.420000),
-  (6,  'male',   'other',  'Trying every ramen place in town.',         ARRAY['food','ramen','cycling']::text[], 25, 30.610000, 50.490000),
-  (7,  'female', 'female', 'Design, museums, and spontaneous trips.',   ARRAY['design','museums','travel']::text[], 61, 30.520000, 50.470000),
-  (8,  'other',  'other',  'Quiet days, loud concerts.',                ARRAY['concerts','cats','gaming']::text[], 12, 30.450000, 50.410000),
-  (9,  'male',   'female', 'Runner. Learning Ukrainian.',               ARRAY['running','languages','nature']::text[], 47, 30.575000, 50.445000),
-  (10, 'female', 'male',   'Tea, poetry, and rainy weather.',           ARRAY['tea','poetry','movies']::text[], 29, 30.560000, 50.430000);
+INSERT INTO profiles (sex, sexual_preferences, biography, list_of_interests, fame, longitude, latitude) VALUES
+  ('male',   'female', 'Coffee, hiking, and honest conversations.', ARRAY['hiking','coffee','travel']::text[], 42, 30.523400, 50.450100),
+  ('female', 'male',   'Bookworm. Learning to cook Italian.',       ARRAY['books','cooking','movies']::text[], 18, 30.516700, 50.433300),
+  ('other',  'both',   'Music producer. Night walks are the best.', ARRAY['music','photography','art']::text[], 67, 30.500000, 50.454660),
+  ('male',   'both',   'Gym, startups, and board games.',           ARRAY['fitness','startups','boardgames']::text[], 55, 30.540000, 50.460000),
+  ('female', 'both',   'Dog person. Sunday brunch enthusiast.',     ARRAY['dogs','brunch','yoga']::text[], 33, 30.490000, 50.420000),
+  ('male',   'other',  'Trying every ramen place in town.',         ARRAY['food','ramen','cycling']::text[], 25, 30.610000, 50.490000),
+  ('female', 'female', 'Design, museums, and spontaneous trips.',   ARRAY['design','museums','travel']::text[], 61, 30.520000, 50.470000),
+  ('other',  'other',  'Quiet days, loud concerts.',                ARRAY['concerts','cats','gaming']::text[], 12, 30.450000, 50.410000),
+  ('male',   'female', 'Runner. Learning Ukrainian.',               ARRAY['running','languages','nature']::text[], 47, 30.575000, 50.445000),
+  ('female', 'male',   'Tea, poetry, and rainy weather.',           ARRAY['tea','poetry','movies']::text[], 29, 30.560000, 50.430000);
 
--- keep users in sync with explicit profile ids
-INSERT INTO users (id, profile_id, name, surname, email, password) VALUES
-  (1,  1,  'Alex',   'Koval',     'alex.koval@example.com',   'password123'),
-  (2,  2,  'Marta',  'Shevchenko','marta.shevchenko@example.com','password123'),
-  (3,  3,  'Sam',    'Bondar',    'sam.bondar@example.com',   'password123'),
-  (4,  4,  'Ihor',   'Melnyk',    'ihor.melnyk@example.com',  'password123'),
-  (5,  5,  'Olena',  'Tkachenko', 'olena.tkachenko@example.com','password123'),
-  (6,  6,  'Danylo', 'Hrytsenko', 'danylo.hrytsenko@example.com','password123'),
-  (7,  7,  'Iryna',  'Pavlenko',  'iryna.pavlenko@example.com','password123'),
-  (8,  8,  'Noah',   'Sydorenko', 'noah.sydorenko@example.com','password123'),
-  (9,  9,  'Artem',  'Marchenko', 'artem.marchenko@example.com','password123'),
-  (10, 10, 'Sofia',  'Klymenko',  'sofia.klymenko@example.com','password123');
+INSERT INTO users (profile_id, name, surname, email, password) VALUES
+  (1,  'Alex',   'Koval',     'alex.koval@example.com',   'password123'),
+  (2,  'Marta',  'Shevchenko','marta.shevchenko@example.com','password123'),
+  (3,  'Sam',    'Bondar',    'sam.bondar@example.com',   'password123'),
+  (4,  'Ihor',   'Melnyk',    'ihor.melnyk@example.com',  'password123'),
+  (5,  'Olena',  'Tkachenko', 'olena.tkachenko@example.com','password123'),
+  (6,  'Danylo', 'Hrytsenko', 'danylo.hrytsenko@example.com','password123'),
+  (7,  'Iryna',  'Pavlenko',  'iryna.pavlenko@example.com','password123'),
+  (8,  'Noah',   'Sydorenko', 'noah.sydorenko@example.com','password123'),
+  (9,  'Artem',  'Marchenko', 'artem.marchenko@example.com','password123'),
+  (10, 'Sofia',  'Klymenko',  'sofia.klymenko@example.com','password123');
 
--- one avatar per profile (matches the partial unique index)
 INSERT INTO images (profile_id, image_url, is_avatar) VALUES
   (1,  'https://picsum.photos/seed/matcha-1/600/600',  TRUE),
   (2,  'https://picsum.photos/seed/matcha-2/600/600',  TRUE),
