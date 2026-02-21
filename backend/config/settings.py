@@ -12,20 +12,38 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 
 from pathlib import Path
 
+import environ
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Environment (.env is optional)
+env = environ.Env(
+    DEBUG=(bool, True),
+    SECRET_KEY=(str, 'django-insecure-change-me'),
+    ALLOWED_HOSTS=(list, []),
+    DB_NAME=(str, 'matcha_test'),
+    DB_USER=(str, 'matcha'),
+    DB_PASSWORD=(str, 'matcha_password'),
+    DB_HOST=(str, 'localhost'),
+    DB_PORT=(int, 5433),
+)
+
+_env_path = BASE_DIR / '.env'
+if _env_path.exists():
+    environ.Env.read_env(str(_env_path))
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-)5yrl663++-f3x#(+=tj0+oxsb7#uvhqi0-fxnjbals!#(=v#*'
+SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env('DEBUG')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env('ALLOWED_HOSTS')
 
 
 # Application definition
@@ -37,8 +55,24 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'hello'
+    'rest_framework',
+    'drf_spectacular',
 ]
+
+# Django REST Framework settings
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+# drf-spectacular settings
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Matcha API',
+    'DESCRIPTION': 'Dating application backend API',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'PREPROCESSING_HOOKS': ['schema.custom_preprocessing_hook'],
+    'POSTPROCESSING_HOOKS': ['schema.custom_postprocessing_hook'],
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -73,12 +107,23 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Prefer DATABASE_URL when set, otherwise use compose-like DB_* vars.
+# Set DB_HOST=db and DB_PORT=5432 when running inside docker network.
+if env('DATABASE_URL', default=None):
+    DATABASES = {
+        'default': env.db('DATABASE_URL'),
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': env('DB_NAME'),
+            'USER': env('DB_USER'),
+            'PASSWORD': env('DB_PASSWORD'),
+            'HOST': env('DB_HOST'),
+            'PORT': env('DB_PORT'),
+        }
+    }
 
 
 # Password validation
