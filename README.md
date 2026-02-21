@@ -16,6 +16,14 @@
 docker compose up -d db pgadmin
 ```
 
+если порт занят, то убить его можно
+
+```
+sudo kill -9 $(sudo lsof -t -i:5433)
+```
+
+
+
 Проверить статус:
 
 ```bash
@@ -97,5 +105,3 @@ docker compose exec -T db psql -U matcha -d matcha_test -f /docker-entrypoint-in
 
 - Если `db` “не видит” изменения в `db/init`: удалите volume (`docker compose down -v`) или прогоните SQL вручную через `psql -f`.
 - Если порт занят: поменяйте `DB_PORT`/`PGADMIN_PORT`.
-
-
